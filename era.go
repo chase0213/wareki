@@ -1502,7 +1502,7 @@ func constructTrieFromEras(eras []Era) (*trie.RuneTrie, error) {
 }
 
 func parseEra(rawData []rawEraData) ([]Era, error) {
-	eras := make([]Era, len(rawData), 0)
+	eras := make([]Era, 0, len(rawData))
 
 	for _, data := range rawData {
 		era := Era{}
