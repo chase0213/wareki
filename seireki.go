@@ -1,4 +1,4 @@
-package main
+package wareki
 
 import (
 	"errors"
@@ -11,6 +11,11 @@ type Seireki struct {
 }
 
 func (s *Seireki) Wareki() (Wareki, error) {
+	eras, err := LoadEras()
+	if err != nil {
+		return Wareki{}, err
+	}
+
 	lPtr, rPtr := 0, len(eras)-1
 	cPtr := int((rPtr - lPtr) / 2)
 	for true {

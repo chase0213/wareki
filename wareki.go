@@ -1,4 +1,4 @@
-package main
+package wareki
 
 type Wareki struct {
 	Name  string `json:"name"`
