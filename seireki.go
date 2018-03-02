@@ -11,15 +11,29 @@ type Seireki struct {
 }
 
 func (s *Seireki) Wareki() (Wareki, error) {
-	lPtr, rPtr := 0, len(eraDict)-1
+	lPtr, rPtr := 0, len(eras)-1
 	cPtr := int((rPtr - lPtr) / 2)
 	for true {
-		center := eraDict[cPtr]
+		center := eras[cPtr]
+
+		//
+		// beginning of the first era < target date
+		//
+		first := eras[0]
+		if CompareDate(s.Year, s.Month, s.Day, first.BeginYear, first.BeginMonth, first.BeginDay) < 0 {
+			return Wareki{
+				Name:  "【元号不明】",
+				Yomi:  "",
+				Year:  s.Year,
+				Month: s.Month,
+				Day:   s.Day,
+			}, nil
+		}
 
 		//
 		// beginning of current era >= target date
 		//
-		current := eraDict[rPtr]
+		current := eras[rPtr]
 		if CompareDate(s.Year, s.Month, s.Day, current.BeginYear, current.BeginMonth, current.BeginDay) >= 0 {
 			return Wareki{
 				Name:  current.Name,

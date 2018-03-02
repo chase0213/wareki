@@ -2,12 +2,20 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"strconv"
 	"strings"
+
+	"github.com/dghubble/trie"
 )
 
-type EraDict struct {
+type EraSearcher struct {
+	Eras []Era
+	Trie trie.Trier
+}
+
+type Era struct {
 	Name       string `json:"name"`
 	Yomi       string `json:"yomi"`
 	BeginYear  int    `json:"begin_year"`
@@ -25,7 +33,33 @@ type dataFromJson struct {
 	EndAt   string `json:"end_at"`
 }
 
-func LoadEras() ([]EraDict, error) {
+func (es *EraSearcher) Search(query string) (Era, error) {
+	var era Era
+	jsonEra := fmt.Sprintf("%s", es.Trie.Get(query))
+	if err := json.Unmarshal([]byte(jsonEra), &era); err != nil {
+		return Era{}, err
+	}
+
+	return era, nil
+}
+
+func NewEraSearcher() (*EraSearcher, error) {
+	eras, err := LoadEras()
+	if err != nil {
+		return nil, err
+	}
+
+	trie, err := constructTrieFromEras(eras)
+
+	es := EraSearcher{
+		Eras: eras,
+		Trie: trie,
+	}
+
+	return &es, nil
+}
+
+func LoadEras() ([]Era, error) {
 	bytes, err := ioutil.ReadFile("eras.json")
 	if err != nil {
 		return nil, err
@@ -36,11 +70,11 @@ func LoadEras() ([]EraDict, error) {
 		return nil, err
 	}
 
-	eras := make([]EraDict, 0, len(data))
+	eras := make([]Era, 0, len(data))
 	for _, d := range data {
-		era, err := ParseEra(d)
+		era, err := parseEra(d)
 		if err != nil {
-			return []EraDict{}, err
+			return []Era{}, err
 		}
 
 		eras = append(eras, era)
@@ -49,8 +83,17 @@ func LoadEras() ([]EraDict, error) {
 	return eras, nil
 }
 
-func ParseEra(data dataFromJson) (EraDict, error) {
-	era := EraDict{}
+func constructTrieFromEras(eras []Era) (*trie.RuneTrie, error) {
+	trie := trie.NewRuneTrie()
+	for _, era := range eras {
+		jsonEra, _ := json.Marshal(era)
+		trie.Put(era.Name, jsonEra)
+	}
+	return trie, nil
+}
+
+func parseEra(data dataFromJson) (Era, error) {
+	era := Era{}
 	era.Name = data.Era
 	era.Yomi = data.Yomi
 

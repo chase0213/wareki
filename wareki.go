@@ -9,7 +9,18 @@ type Wareki struct {
 }
 
 func (w *Wareki) Seireki() (Seireki, error) {
-	return Seireki{}, nil
+	es, err := NewEraSearcher()
+	if err != nil {
+		return Seireki{}, err
+	}
+
+	era, err := es.Search(w.Name)
+	seireki := Seireki{
+		Year:  era.BeginYear + w.Year - 1,
+		Month: w.Month,
+		Day:   w.Day,
+	}
+	return seireki, nil
 }
 
 // AD is an alias method of Seireki()

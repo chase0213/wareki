@@ -3,12 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/urfave/cli"
 )
 
-var eraDict []EraDict
+var eras []Era
 
 func main() {
 
@@ -30,14 +29,20 @@ func main() {
 		{
 			Name:    "wareki",
 			Aliases: []string{"w"},
-			Usage:   "wareki -w ${YEAR}/${MONTH}/${DAY}",
+			Usage:   "./wareki w ${YEAR}/${MONTH}/${DAY}",
 			Action:  SeirekiToWarekiAction,
+		},
+		{
+			Name:    "seireki",
+			Aliases: []string{"s"},
+			Usage:   "./wareki s ${WAREKI}${YEAR}年${MONTH}月${DAY}日",
+			Action:  WarekiToSeirekiAction,
 		},
 	}
 
 	app.Before = func(c *cli.Context) error {
 		var err error
-		if eraDict, err = LoadEras(); err != nil {
+		if eras, err = LoadEras(); err != nil {
 			return err
 		}
 		return nil
@@ -50,19 +55,42 @@ func main() {
 	app.Run(os.Args)
 }
 
-func SeirekiToWarekiAction(c *cli.Context) {
-
-	// グローバルオプション
-	var toWareki = c.GlobalBool("w")
-	if toWareki {
-		fmt.Println("this is dry-run")
-	}
-
+func WarekiToSeirekiAction(c *cli.Context) error {
 	var dateStr = ""
 	if len(c.Args()) > 0 {
 		dateStr = c.Args().First()
 	}
 
-	dateSlice := strings.Split(dateStr, "/")
-	fmt.Printf("%v\n", dateSlice)
+	wareki, err := ParseWarekiString(dateStr)
+	if err != nil {
+		return err
+	}
+
+	seireki, err := wareki.Seireki()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%d年%d月%d日\n", seireki.Year, seireki.Month, seireki.Day)
+	return nil
+}
+
+func SeirekiToWarekiAction(c *cli.Context) error {
+	var dateStr = ""
+	if len(c.Args()) > 0 {
+		dateStr = c.Args().First()
+	}
+
+	seireki, err := ParseSeirekiString(dateStr)
+	if err != nil {
+		return err
+	}
+
+	wareki, err := seireki.Wareki()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("%s%d年%d月%d日\n", wareki.Name, wareki.Year, wareki.Month, wareki.Day)
+	return nil
 }
