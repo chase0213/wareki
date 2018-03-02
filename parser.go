@@ -6,6 +6,8 @@ import (
 	"strconv"
 )
 
+// ParseWarekiString parses date string formatted as wareki
+// and converts it into Wareki structure
 func ParseWarekiString(dateStr string) (Wareki, error) {
 	dateWithoutNumber := regexp.MustCompile("一|二|三|四|五|六|七|八|九|十|百|千|零|元|[0-9０-９]+").Split(dateStr, 2)
 	if len(dateWithoutNumber) < 2 {
@@ -39,6 +41,8 @@ func ParseWarekiString(dateStr string) (Wareki, error) {
 	return wareki, nil
 }
 
+// ParseSeirekiString parses date string formatted as seireki
+// and converts it into Seireki structure
 func ParseSeirekiString(dateStr string) (Seireki, error) {
 	dateSlice := regexp.MustCompile("/|,|-|\\s|年|月|日").Split(dateStr, 4)
 	if len(dateSlice) < 3 {
