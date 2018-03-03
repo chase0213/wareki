@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/chase0213/wareki.svg?branch=master)](https://travis-ci.org/chase0213/wareki)
+
 # wareki
 
 ## References / Sources
