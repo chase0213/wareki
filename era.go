@@ -9,6 +9,7 @@ import (
 	"github.com/dghubble/trie"
 )
 
+// EraSearcher is a structure to search eras
 type EraSearcher struct {
 	Eras []Era
 	Trie trie.Trier

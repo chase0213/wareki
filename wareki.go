@@ -8,6 +8,7 @@ type Wareki struct {
 	Day   int    `json:"day"`
 }
 
+// Seireki converts given date formatted as wareki(和暦) into seireki(西暦)
 func (w *Wareki) Seireki() (Seireki, error) {
 	es, err := NewEraSearcher()
 	if err != nil {
