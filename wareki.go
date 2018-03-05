@@ -1,3 +1,7 @@
+/*
+Package wareki implements a simple converter
+for Japanese date format.
+*/
 package wareki
 
 type Wareki struct {
