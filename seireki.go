@@ -4,17 +4,37 @@ import (
 	"errors"
 )
 
-type Seireki struct {
-	Year  int `json:"year"`
-	Month int `json:"month"`
-	Day   int `json:"day"`
+// Seireki implements converter methods for Japanese date formats
+type Seireki interface {
+	Year()
+	Month()
+	Day()
+	Wareki()
+}
+
+type seireki struct {
+	year  int
+	month int
+	day   int
+}
+
+func (s *seireki) Year() int {
+	return s.year
+}
+
+func (s *seireki) Month() int {
+	return s.month
+}
+
+func (s *seireki) Day() int {
+	return s.day
 }
 
 // Wareki converts given date formatted as seireki(西暦) into wareki(和暦)
-func (s *Seireki) Wareki() (Wareki, error) {
+func (s *seireki) Wareki() (*wareki, error) {
 	eras, err := LoadEras()
 	if err != nil {
-		return Wareki{}, err
+		return nil, err
 	}
 
 	lPtr, rPtr := 0, len(eras)-1
@@ -26,13 +46,13 @@ func (s *Seireki) Wareki() (Wareki, error) {
 		// beginning of the first era < target date
 		//
 		first := eras[0]
-		if CompareDate(s.Year, s.Month, s.Day, first.BeginYear, first.BeginMonth, first.BeginDay) < 0 {
-			return Wareki{
-				Name:  "【元号不明】",
-				Yomi:  "",
-				Year:  s.Year,
-				Month: s.Month,
-				Day:   s.Day,
+		if CompareDate(s.year, s.month, s.day, first.BeginYear, first.BeginMonth, first.BeginDay) < 0 {
+			return &wareki{
+				name:  "【元号不明】",
+				yomi:  "",
+				year:  s.year,
+				month: s.month,
+				day:   s.day,
 			}, nil
 		}
 
@@ -40,39 +60,39 @@ func (s *Seireki) Wareki() (Wareki, error) {
 		// beginning of current era >= target date
 		//
 		current := eras[rPtr]
-		if CompareDate(s.Year, s.Month, s.Day, current.BeginYear, current.BeginMonth, current.BeginDay) >= 0 {
-			return Wareki{
-				Name:  current.Name,
-				Yomi:  current.Yomi,
-				Year:  s.Year - current.BeginYear + 1,
-				Month: s.Month,
-				Day:   s.Day,
+		if CompareDate(s.year, s.month, s.day, current.BeginYear, current.BeginMonth, current.BeginDay) >= 0 {
+			return &wareki{
+				name:  current.Name,
+				yomi:  current.Yomi,
+				year:  s.year - current.BeginYear + 1,
+				month: s.month,
+				day:   s.day,
 			}, nil
 		}
 
 		//
 		// beginning of era <= target date < end of era
 		//
-		if CompareDate(s.Year, s.Month, s.Day, center.BeginYear, center.BeginMonth, center.BeginDay) >= 0 &&
-			CompareDate(s.Year, s.Month, s.Day, center.EndYear, center.EndMonth, center.EndDay) <= 0 {
-			return Wareki{
-				Name:  center.Name,
-				Yomi:  center.Yomi,
-				Year:  s.Year - center.BeginYear + 1,
-				Month: s.Month,
-				Day:   s.Day,
+		if CompareDate(s.year, s.month, s.day, center.BeginYear, center.BeginMonth, center.BeginDay) >= 0 &&
+			CompareDate(s.year, s.month, s.day, center.EndYear, center.EndMonth, center.EndDay) <= 0 {
+			return &wareki{
+				name:  center.Name,
+				yomi:  center.Yomi,
+				year:  s.year - center.BeginYear + 1,
+				month: s.month,
+				day:   s.day,
 			}, nil
 		}
 
 		// if lPtr = rPtr = cPtr and no era hits
 		if lPtr >= rPtr {
-			return Wareki{}, errors.New("invalid date: no era found")
+			return nil, errors.New("invalid date: no era found")
 		}
 
 		//
 		// beginning of era > target date
 		//
-		if CompareDate(s.Year, s.Month, s.Day, center.BeginYear, center.BeginMonth, center.BeginDay) == -1 {
+		if CompareDate(s.year, s.month, s.day, center.BeginYear, center.BeginMonth, center.BeginDay) == -1 {
 			rPtr = cPtr - 1
 			cPtr = int((rPtr-lPtr)/2) + lPtr
 		}
@@ -80,12 +100,12 @@ func (s *Seireki) Wareki() (Wareki, error) {
 		//
 		// target date <= end of era
 		//
-		if CompareDate(s.Year, s.Month, s.Day, center.EndYear, center.EndMonth, center.EndDay) >= 0 {
+		if CompareDate(s.year, s.month, s.day, center.EndYear, center.EndMonth, center.EndDay) >= 0 {
 			lPtr = cPtr + 1
 			cPtr = int((rPtr-lPtr)/2) + lPtr
 		}
 	}
-	return Wareki{}, nil
+	return nil, nil
 }
 
 // CompareDate compares two dates, and returns

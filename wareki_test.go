@@ -3,47 +3,33 @@ package wareki
 import "testing"
 
 func TestWarekiToSeireki(t *testing.T) {
-	var wareki Wareki
-
-	wareki.Name = "平成"
-	wareki.Year = 30
-	wareki.Month = 2
-	wareki.Day = 13
-
-	seireki, err := wareki.Seireki()
+	w := wareki{"平成", "", 30, 2, 13}
+	seireki, err := w.Seireki()
 	if err != nil {
-		t.Errorf("%s%d年%d月%d日 should be parsed successfully", wareki.Name, wareki.Year, wareki.Month, wareki.Day)
+		t.Errorf("%s%d年%d月%d日 should be parsed successfully", w.name, w.year, w.month, w.day)
 	}
 
-	if seireki.Year != 2018 || seireki.Month != 2 || seireki.Day != 13 {
-		t.Errorf("expected\t2018/2/13\ngot\t%d/%d/%d", seireki.Year, seireki.Month, seireki.Day)
+	if seireki.year != 2018 || seireki.month != 2 || seireki.day != 13 {
+		t.Errorf("expected\t2018/2/13\ngot\t%d/%d/%d", seireki.year, seireki.month, seireki.day)
 	}
 
-	wareki.Name = "昭和"
-	wareki.Year = 64
-	wareki.Month = 1
-	wareki.Day = 7
-
-	seireki, err = wareki.Seireki()
+	w = wareki{"昭和", "", 64, 1, 7}
+	seireki, err = w.Seireki()
 	if err != nil {
-		t.Errorf("%s%d年%d月%d日 should be parsed successfully", wareki.Name, wareki.Year, wareki.Month, wareki.Day)
+		t.Errorf("%s%d年%d月%d日 should be parsed successfully", w.name, w.year, w.month, w.day)
 	}
 
-	if seireki.Year != 1989 || seireki.Month != 1 || seireki.Day != 7 {
-		t.Errorf("expected\t1989/1/7\ngot\t%d/%d/%d", seireki.Year, seireki.Month, seireki.Day)
+	if seireki.year != 1989 || seireki.month != 1 || seireki.day != 7 {
+		t.Errorf("expected\t1989/1/7\ngot\t%d/%d/%d", seireki.year, seireki.month, seireki.day)
 	}
 
-	wareki.Name = "存在しない元号"
-	wareki.Year = 123
-	wareki.Month = 2
-	wareki.Day = 13
-
-	seireki, err = wareki.Seireki()
+	w = wareki{"存在しない元号", "", 123, 2, 13}
+	seireki, err = w.Seireki()
 	if err != nil {
-		t.Errorf("%s%d年%d月%d日 should be parsed successfully", wareki.Name, wareki.Year, wareki.Month, wareki.Day)
+		t.Errorf("%s%d年%d月%d日 should be parsed successfully", w.name, w.year, w.month, w.day)
 	}
 
-	if seireki.Year != 122 || seireki.Month != 2 || seireki.Day != 13 {
-		t.Errorf("expected\122/2/13\ngot\t%d/%d/%d", seireki.Year, seireki.Month, seireki.Day)
+	if seireki.year != 122 || seireki.month != 2 || seireki.day != 13 {
+		t.Errorf("expected\122/2/13\ngot\t%d/%d/%d", seireki.year, seireki.month, seireki.day)
 	}
 }
