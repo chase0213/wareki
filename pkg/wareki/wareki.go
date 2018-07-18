@@ -5,16 +5,7 @@ for Japanese date format.
 package wareki
 
 // Wareki implements converter methods for Japanese date formats
-type Wareki interface {
-	Name()
-	Yomi()
-	Year()
-	Month()
-	Day()
-	Seireki()
-}
-
-type wareki struct {
+type Wareki struct {
 	name  string
 	yomi  string
 	year  int
@@ -22,35 +13,35 @@ type wareki struct {
 	day   int
 }
 
-func (w *wareki) Name() string {
+func (w *Wareki) Name() string {
 	return w.name
 }
 
-func (w *wareki) Yomi() string {
+func (w *Wareki) Yomi() string {
 	return w.yomi
 }
 
-func (w *wareki) Year() int {
+func (w *Wareki) Year() int {
 	return w.year
 }
 
-func (w *wareki) Month() int {
+func (w *Wareki) Month() int {
 	return w.month
 }
 
-func (w *wareki) Day() int {
+func (w *Wareki) Day() int {
 	return w.day
 }
 
 // Seireki converts given date formatted as wareki(和暦) into seireki(西暦)
-func (w *wareki) Seireki() (*seireki, error) {
+func (w *Wareki) Seireki() (*Seireki, error) {
 	es, err := NewEraSearcher()
 	if err != nil {
 		return nil, err
 	}
 
 	era, err := es.Search(w.name)
-	seireki := &seireki{
+	seireki := &Seireki{
 		year:  era.BeginYear + w.year - 1,
 		month: w.month,
 		day:   w.day,
@@ -59,6 +50,6 @@ func (w *wareki) Seireki() (*seireki, error) {
 }
 
 // AD is an alias method of Seireki()
-func (w *wareki) AD() (*seireki, error) {
+func (w *Wareki) AD() (*Seireki, error) {
 	return w.Seireki()
 }

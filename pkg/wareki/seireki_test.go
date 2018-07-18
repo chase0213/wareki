@@ -3,7 +3,7 @@ package wareki
 import "testing"
 
 func TestSeirekiToWareki(t *testing.T) {
-	s := seireki{2018, 3, 31}
+	s := Seireki{2018, 3, 31}
 	wareki, err := s.Wareki()
 	if err != nil {
 		t.Errorf("%d/%d/%d should be parsed successfully", s.year, s.month, s.day)
@@ -13,7 +13,7 @@ func TestSeirekiToWareki(t *testing.T) {
 		t.Errorf("expected\t平成（へいせい）30年3月31日\ngot\t%s（%s）%d年%d月%d日", wareki.name, wareki.yomi, wareki.year, wareki.month, wareki.day)
 	}
 
-	s = seireki{1989, 1, 7}
+	s = Seireki{1989, 1, 7}
 	wareki, err = s.Wareki()
 	if err != nil {
 		t.Errorf("%d/%d/%d should be parsed successfully", s.year, s.month, s.day)
@@ -23,7 +23,7 @@ func TestSeirekiToWareki(t *testing.T) {
 		t.Errorf("expected\t昭和（しょうわ）1年1月7日\ngot\t%s（%s）%d年%d月%d日", wareki.name, wareki.yomi, wareki.year, wareki.month, wareki.day)
 	}
 
-	s = seireki{1989, 1, 8}
+	s = Seireki{1989, 1, 8}
 	wareki, err = s.Wareki()
 	if err != nil {
 		t.Errorf("%d/%d/%d should be parsed successfully", s.year, s.month, s.day)
@@ -33,7 +33,7 @@ func TestSeirekiToWareki(t *testing.T) {
 		t.Errorf("expected\t平成（へいせい）1年1月8日\ngot\t%s（%s）%d年%d月%d日", wareki.name, wareki.yomi, wareki.year, wareki.month, wareki.day)
 	}
 
-	s = seireki{123, 1, 8}
+	s = Seireki{123, 1, 8}
 	wareki, err = s.Wareki()
 	if err != nil {
 		t.Errorf("%d/%d/%d should be parsed successfully", s.year, s.month, s.day)
@@ -46,22 +46,22 @@ func TestSeirekiToWareki(t *testing.T) {
 }
 
 func TestCompareDates(t *testing.T) {
-	date1 := seireki{2018, 1, 13}
-	date2 := seireki{2017, 4, 8}
+	date1 := Seireki{2018, 1, 13}
+	date2 := Seireki{2017, 4, 8}
 
 	if CompareDate(date1.year, date1.month, date1.day, date2.year, date2.month, date2.day) != 1 {
 		t.Errorf("comparison of %d/%d/%d with %d/%d/%d should return 1", date1.year, date1.month, date1.day, date2.year, date2.month, date2.day)
 	}
 
-	date1 = seireki{2018, 1, 13}
-	date2 = seireki{2018, 1, 14}
+	date1 = Seireki{2018, 1, 13}
+	date2 = Seireki{2018, 1, 14}
 
 	if CompareDate(date1.year, date1.month, date1.day, date2.year, date2.month, date2.day) != -1 {
 		t.Errorf("comparison of %d/%d/%d with %d/%d/%d should return -1", date1.year, date1.month, date1.day, date2.year, date2.month, date2.day)
 	}
 
-	date1 = seireki{2018, 1, 13}
-	date2 = seireki{2018, 1, 13}
+	date1 = Seireki{2018, 1, 13}
+	date2 = Seireki{2018, 1, 13}
 
 	if CompareDate(date1.year, date1.month, date1.day, date2.year, date2.month, date2.day) != 0 {
 		t.Errorf("comparison of %d/%d/%d with %d/%d/%d should return 0", date1.year, date1.month, date1.day, date2.year, date2.month, date2.day)

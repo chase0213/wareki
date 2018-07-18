@@ -5,33 +5,26 @@ import (
 )
 
 // Seireki implements converter methods for Japanese date formats
-type Seireki interface {
-	Year()
-	Month()
-	Day()
-	Wareki()
-}
-
-type seireki struct {
+type Seireki struct {
 	year  int
 	month int
 	day   int
 }
 
-func (s *seireki) Year() int {
+func (s *Seireki) Year() int {
 	return s.year
 }
 
-func (s *seireki) Month() int {
+func (s *Seireki) Month() int {
 	return s.month
 }
 
-func (s *seireki) Day() int {
+func (s *Seireki) Day() int {
 	return s.day
 }
 
-// Wareki converts given date formatted as seireki(西暦) into wareki(和暦)
-func (s *seireki) Wareki() (*wareki, error) {
+// Wareki converts given date formatted as Seireki(西暦) into wareki(和暦)
+func (s *Seireki) Wareki() (*Wareki, error) {
 	eras, err := LoadEras()
 	if err != nil {
 		return nil, err
@@ -47,7 +40,7 @@ func (s *seireki) Wareki() (*wareki, error) {
 		//
 		first := eras[0]
 		if CompareDate(s.year, s.month, s.day, first.BeginYear, first.BeginMonth, first.BeginDay) < 0 {
-			return &wareki{
+			return &Wareki{
 				name:  "【元号不明】",
 				yomi:  "",
 				year:  s.year,
@@ -61,7 +54,7 @@ func (s *seireki) Wareki() (*wareki, error) {
 		//
 		current := eras[rPtr]
 		if CompareDate(s.year, s.month, s.day, current.BeginYear, current.BeginMonth, current.BeginDay) >= 0 {
-			return &wareki{
+			return &Wareki{
 				name:  current.Name,
 				yomi:  current.Yomi,
 				year:  s.year - current.BeginYear + 1,
@@ -75,7 +68,7 @@ func (s *seireki) Wareki() (*wareki, error) {
 		//
 		if CompareDate(s.year, s.month, s.day, center.BeginYear, center.BeginMonth, center.BeginDay) >= 0 &&
 			CompareDate(s.year, s.month, s.day, center.EndYear, center.EndMonth, center.EndDay) <= 0 {
-			return &wareki{
+			return &Wareki{
 				name:  center.Name,
 				yomi:  center.Yomi,
 				year:  s.year - center.BeginYear + 1,
