@@ -1,50 +1,121 @@
 package wareki
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
-func TestSeirekiToWareki(t *testing.T) {
-	s := Seireki{2018, 3, 31}
-	wareki, err := s.Wareki()
-	if err != nil {
-		t.Errorf("%d/%d/%d should be parsed successfully", s.year, s.month, s.day)
+func TestSeireki_Wareki(t *testing.T) {
+	type fields struct {
+		year  int
+		month int
+		day   int
 	}
-
-	if wareki.name != "平成" || wareki.yomi != "へいせい" || wareki.year != 30 || wareki.month != 3 || wareki.day != 31 {
-		t.Errorf("expected\t平成（へいせい）30年3月31日\ngot\t%s（%s）%d年%d月%d日", wareki.name, wareki.yomi, wareki.year, wareki.month, wareki.day)
+	tests := []struct {
+		name    string
+		fields  fields
+		want    *Wareki
+		wantErr bool
+	}{
+		{
+			name: "it should return 平成 date",
+			fields: fields{
+				year:  2018,
+				month: 3,
+				day:   31,
+			},
+			want: &Wareki{
+				name:  "平成",
+				yomi:  "へいせい",
+				year:  30,
+				month: 3,
+				day:   31,
+			},
+			wantErr: false,
+		},
+		{
+			name: "it should return 昭和 date",
+			fields: fields{
+				year:  1989,
+				month: 1,
+				day:   7,
+			},
+			want: &Wareki{
+				name:  "昭和",
+				yomi:  "しょうわ",
+				year:  64,
+				month: 1,
+				day:   7,
+			},
+			wantErr: false,
+		},
+		{
+			name: "it should return 平成 date",
+			fields: fields{
+				year:  1989,
+				month: 1,
+				day:   8,
+			},
+			want: &Wareki{
+				name:  "平成",
+				yomi:  "へいせい",
+				year:  1,
+				month: 1,
+				day:   8,
+			},
+			wantErr: false,
+		},
+		{
+			name: "it should return 平成 date",
+			fields: fields{
+				year:  2019,
+				month: 4,
+				day:   30,
+			},
+			want: &Wareki{
+				name:  "平成",
+				yomi:  "へいせい",
+				year:  31,
+				month: 4,
+				day:   30,
+			},
+			wantErr: false,
+		},
+		{
+			name: "it should return 令和 date",
+			fields: fields{
+				year:  2019,
+				month: 5,
+				day:   1,
+			},
+			want: &Wareki{
+				name:  "令和",
+				yomi:  "れいわ",
+				year:  1,
+				month: 5,
+				day:   1,
+			},
+			wantErr: false,
+		},
 	}
-
-	s = Seireki{1989, 1, 7}
-	wareki, err = s.Wareki()
-	if err != nil {
-		t.Errorf("%d/%d/%d should be parsed successfully", s.year, s.month, s.day)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &Seireki{
+				year:  tt.fields.year,
+				month: tt.fields.month,
+				day:   tt.fields.day,
+			}
+			got, err := s.Wareki()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Seireki.Wareki() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Seireki.Wareki() = %v, want %v", got, tt.want)
+			}
+		})
 	}
-
-	if wareki.name != "昭和" || wareki.yomi != "しょうわ" || wareki.year != 64 || wareki.month != 1 || wareki.day != 7 {
-		t.Errorf("expected\t昭和（しょうわ）1年1月7日\ngot\t%s（%s）%d年%d月%d日", wareki.name, wareki.yomi, wareki.year, wareki.month, wareki.day)
-	}
-
-	s = Seireki{1989, 1, 8}
-	wareki, err = s.Wareki()
-	if err != nil {
-		t.Errorf("%d/%d/%d should be parsed successfully", s.year, s.month, s.day)
-	}
-
-	if wareki.name != "平成" || wareki.yomi != "へいせい" || wareki.year != 1 || wareki.month != 1 || wareki.day != 8 {
-		t.Errorf("expected\t平成（へいせい）1年1月8日\ngot\t%s（%s）%d年%d月%d日", wareki.name, wareki.yomi, wareki.year, wareki.month, wareki.day)
-	}
-
-	s = Seireki{123, 1, 8}
-	wareki, err = s.Wareki()
-	if err != nil {
-		t.Errorf("%d/%d/%d should be parsed successfully", s.year, s.month, s.day)
-	}
-
-	if wareki.name != "【元号不明】" || wareki.yomi != "" || wareki.year != 123 || wareki.month != 1 || wareki.day != 8 {
-		t.Errorf("expected\t平成（へいせい）1年1月8日\ngot\t%s（%s）%d年%d月%d日", wareki.name, wareki.yomi, wareki.year, wareki.month, wareki.day)
-	}
-
 }
-
 func TestCompareDates(t *testing.T) {
 	date1 := Seireki{2018, 1, 13}
 	date2 := Seireki{2017, 4, 8}
