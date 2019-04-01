@@ -1480,6 +1480,12 @@ func LoadEras() ([]Era, error) {
 			Name:    "平成",
 			Yomi:    "へいせい",
 			BeginAt: "1989-1-8",
+			EndAt:   "2019-4-30",
+		},
+		rawEraData{
+			Name:    "令和",
+			Yomi:    "れいわ",
+			BeginAt: "2019-5-1",
 			EndAt:   "",
 		},
 	}
