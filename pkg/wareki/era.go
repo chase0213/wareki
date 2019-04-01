@@ -9,6 +9,7 @@ import (
 	"github.com/dghubble/trie"
 )
 
+// EraSearcher is a structure to search eras
 type EraSearcher struct {
 	Eras []Era
 	Trie trie.Trier
@@ -32,6 +33,7 @@ type rawEraData struct {
 	EndAt   string
 }
 
+// Search returns a Era struct filtered by the given query
 func (es *EraSearcher) Search(query string) (Era, error) {
 	var era Era
 	jsonEra := fmt.Sprintf("%s", es.Trie.Get(query))
@@ -42,6 +44,7 @@ func (es *EraSearcher) Search(query string) (Era, error) {
 	return era, nil
 }
 
+// NewEraSearcher is a constructor for EraSearcher
 func NewEraSearcher() (*EraSearcher, error) {
 	eras, err := LoadEras()
 	if err != nil {
@@ -58,6 +61,7 @@ func NewEraSearcher() (*EraSearcher, error) {
 	return &es, nil
 }
 
+// LoadEras returns a list of eras
 func LoadEras() ([]Era, error) {
 	rawEras := []rawEraData{
 		rawEraData{

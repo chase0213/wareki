@@ -6,21 +6,23 @@ import (
 	"strconv"
 )
 
-func ParseWarekiString(dateStr string) (Wareki, error) {
+// ParseWarekiString parses date string formatted as wareki
+// and converts it into Wareki structure
+func ParseWarekiString(dateStr string) (*Wareki, error) {
 	dateWithoutNumber := regexp.MustCompile("一|二|三|四|五|六|七|八|九|十|百|千|零|元|[0-9０-９]+").Split(dateStr, 2)
 	if len(dateWithoutNumber) < 2 {
-		return Wareki{}, fmt.Errorf("Invalid date format")
+		return nil, fmt.Errorf("Invalid date format")
 	}
 
 	es, err := NewEraSearcher()
 	if err != nil {
-		return Wareki{}, err
+		return nil, err
 	}
 
 	nengo := dateWithoutNumber[0]
 	era, err := es.Search(nengo)
 	if err != nil {
-		return Wareki{}, err
+		return nil, err
 	}
 
 	dateSlice := regexp.MustCompile(era.Name+"|/|,|-|\\s|年|月|日").Split(dateStr, 5)
@@ -28,31 +30,33 @@ func ParseWarekiString(dateStr string) (Wareki, error) {
 	month, _ := numberize(dateSlice[2])
 	day, _ := numberize(dateSlice[3])
 
-	wareki := Wareki{
-		Name:  era.Name,
-		Yomi:  era.Yomi,
-		Year:  year,
-		Month: month,
-		Day:   day,
+	wareki := &Wareki{
+		name:  era.Name,
+		yomi:  era.Yomi,
+		year:  year,
+		month: month,
+		day:   day,
 	}
 
 	return wareki, nil
 }
 
-func ParseSeirekiString(dateStr string) (Seireki, error) {
+// ParseSeirekiString parses date string formatted as seireki
+// and converts it into Seireki structure
+func ParseSeirekiString(dateStr string) (*Seireki, error) {
 	dateSlice := regexp.MustCompile("/|,|-|\\s|年|月|日").Split(dateStr, 4)
 	if len(dateSlice) < 3 {
 		err := fmt.Errorf("Invalid date format: date should be separated by '/', ',', '-', or whitespaces")
-		return Seireki{}, err
+		return nil, err
 	}
 
 	year, _ := strconv.Atoi(dateSlice[0])
 	month, _ := strconv.Atoi(dateSlice[1])
 	day, _ := strconv.Atoi(dateSlice[2])
-	return Seireki{
-		Year:  year,
-		Month: month,
-		Day:   day,
+	return &Seireki{
+		year:  year,
+		month: month,
+		day:   day,
 	}, nil
 }
 
